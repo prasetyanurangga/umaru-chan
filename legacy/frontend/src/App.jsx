@@ -132,6 +132,7 @@ function App() {
     return (
         <div className="app-container">
             <h1>API Gateway Integration</h1>
+            <span>{apiUrl}</span>
             <span>Board ID  : {boardId ?? "Board ID Kosong"}</span>
             {
               sessionToken ? <span>{sessionToken}</span> : <button onClick={handleLogin} className="login-button"> Login </button>

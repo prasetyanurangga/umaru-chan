@@ -5,7 +5,7 @@ import mondaySdk from 'monday-sdk-js';
 
 const monday = mondaySdk();
 
-const apiUrl = "https://442a-103-18-35-51.ngrok-free.app"; // Ganti dengan URL backend Anda
+const apiUrl = import.meta.env.VITE_API_URL; // Ganti dengan URL backend Anda
 
 function App() {
     const [boardId, setBoardId] = useState(null);
@@ -132,7 +132,7 @@ function App() {
     return (
         <div className="app-container">
             <h1>API Gateway Integration</h1>
-            <span>BoardSS  : {boardId ?? "Board ID Kosong"}</span>
+            <span>Board ID  : {boardId ?? "Board ID Kosong"}</span>
             {
               sessionToken ? <span>{sessionToken}</span> : <button onClick={handleLogin} className="login-button"> Login </button>
             }

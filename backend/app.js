@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
 const mondaySdk = require('monday-sdk-js');
-const os = require('os');
+require('dotenv').config()
 
 const cors = require('cors');
 
@@ -12,15 +12,10 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 
-const MONDAY_CLIENT_ID = ""
-const MONDAY_CLIENT_SECRET = ""
-const MONDAY_REDIRECT_URI = "" // Ganti dengan URL redirect yang sesuai
+const MONDAY_CLIENT_ID = process.env.MONDAY_CLIENT_ID
+const MONDAY_CLIENT_SECRET = process.env.MONDAY_CLIENT_SECRET
+const MONDAY_REDIRECT_URI = process.env.MONDAY_REDIRECT_URI
 
-
-
-// monday.setToken(MONDAY_API_KEY);
-
-// Contoh struktur data untuk menyimpan konfigurasi (dalam memori, untuk demonstrasi)
 const configurations = {};
 
 async function verifyMondayToken(req, res, next) {
@@ -41,6 +36,15 @@ async function verifyMondayToken(req, res, next) {
         return res.status(401).json({ error: "Token tidak valid." });
     }
 }
+
+app.get('/whoami', (req, res) => {
+    res.json({
+        MONDAY_CLIENT_ID,
+        MONDAY_CLIENT_SECRET,
+        MONDAY_REDIRECT_URI
+    })
+});
+
 
 app.get("/auth/monday", (req, res) => {
     const clientId = MONDAY_CLIENT_ID;

@@ -1,20 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { configurations } from '@/app/lib/configuration'
 import axios from 'axios'
-import mondaySdk from 'monday-sdk-js'
 
-export async function POST(req: NextRequest, { params }: { params: { boardId: string } }) {
-  const boardId = params.boardId;
-  const config = configurations[boardId];
+export async function POST(
+  req: NextRequest,
+  { params }: { params: { boardId: string } }
+) {
+   const awaitedParams = await params; // Tambahkan 'await' di sini
+  const { boardId } = awaitedParams;
 
-  if (!config) {
-    return NextResponse.json({ error: `Tidak ada konfigurasi untuk Board ID ${boardId}.` }, { status: 404 });
-  }
 
   const token = req.headers.get('authorization')?.replace('Bearer ', '');
   if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { endpointUrl, method, params: queryParams, body, bodyType, mapping } = config;
+  const requestBody = await req.json();
+  const {
+    endpointUrl,
+    method = 'GET',
+    queryParams = {},
+    body,
+    bodyType = 'json',
+    mapping,
+  } = requestBody;
 
   try {
     const headers: any = {};
@@ -32,16 +38,16 @@ export async function POST(req: NextRequest, { params }: { params: { boardId: st
 
     await processAndUpdateMonday(boardId, response.data, mapping, token);
 
-    return NextResponse.json({ message: `Data dari ${endpointUrl} berhasil diproses dan diperbarui untuk Board ID ${boardId}.` });
+    return NextResponse.json({
+      message: `Data dari ${endpointUrl} berhasil diproses dan diperbarui untuk Board ID ${boardId}.`,
+    });
   } catch (err: any) {
+    console.error(err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
 
 async function processAndUpdateMonday(boardId: string, apiData: any, mapping: any, token: string) {
-  const monday = mondaySdk();
-  monday.setToken(token);
-
   const itemsToCreate: any[] = [];
 
   if (Array.isArray(apiData)) {
@@ -56,7 +62,11 @@ async function processAndUpdateMonday(boardId: string, apiData: any, mapping: an
           }
         } catch (_) {}
       }
-      itemsToCreate.push({ itemName: itemData.name || 'New Item', columnValues: itemValues });
+
+      itemsToCreate.push({
+        itemName: itemData.name || 'New Item',
+        columnValues: itemValues,
+      });
     }
 
     for (const item of itemsToCreate) {
@@ -71,13 +81,27 @@ async function processAndUpdateMonday(boardId: string, apiData: any, mapping: an
           }
         }
       `;
-      await monday.api(mutation, {
-        variables: {
-          boardId,
-          itemName: item.itemName,
-          columnValues: JSON.stringify(item.columnValues),
+
+      const res = await fetch('https://api.monday.com/v2', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          query: mutation,
+          variables: {
+            boardId,
+            itemName: item.itemName,
+            columnValues: JSON.stringify(item.columnValues),
+          },
+        }),
       });
+
+      const json = await res.json();
+      if (json.errors) {
+        console.error('Monday API error:', json.errors);
+      }
     }
   }
 }
@@ -93,3 +117,5 @@ function getNestedValue(obj: any, path: string): any {
     return o?.[key];
   }, obj);
 }
+
+

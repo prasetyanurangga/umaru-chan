@@ -9,5 +9,7 @@ export async function GET(request: NextRequest) {
   
   const url = `https://auth.monday.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}`;
 
-  return NextResponse.redirect(url);
+  return NextResponse.json({
+    oauth_url: url,
+  });
 }

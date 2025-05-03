@@ -6,7 +6,13 @@ import cookie from 'cookie';
 export async function GET(req: NextRequest, res: NextResponse) {
   const code = req.nextUrl.searchParams.get('code');
 
-  const url =  getBaseUrl();
+  const url =  `${getBaseUrl()}/api/auth/callback`;
+
+  if (!code) {
+    const redirectUrl = `${req.nextUrl.origin}/login`;
+    const response = NextResponse.redirect(redirectUrl, 302);
+    return response;
+  }
 
   try {
     const res = await fetch("https://auth.monday.com/oauth2/token", {

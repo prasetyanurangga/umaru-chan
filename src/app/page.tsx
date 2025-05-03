@@ -1,31 +1,19 @@
-'use client';
-
+// app/page.tsx (halaman login di path '/')
 import { Button } from '@/components/ui/button';
-import React, { use, useEffect } from 'react';
-import Cookies from 'js-cookie';
-import { useRouter } from 'next/navigation';
-import { useMutation } from '@tanstack/react-query';
+import { getBaseUrl } from '@/app/lib/getBaseUrl';
 
-function Login() {
+export default function LoginPage({ searchParams }: { searchParams?: Record<string, string> }) {
+  const clientId = process.env.MONDAY_CLIENT_ID!; 
+  const redirectUriRaw = getBaseUrl();
+  const redirectUri = encodeURIComponent(`${redirectUriRaw}`);
 
-  useEffect(() => {
-    const baseUrl = window.location.origin;
-    Cookies.set('base_url', baseUrl, { path: '/', sameSite: 'Lax' });
-  }
-  , []);
-
-  const handleLogin = () => {
-    window.location.href = "api/auth/monday";
-  }
-
+  const loginUrl = `https://auth.monday.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}`;
 
   return (
     <div className="app-containe h-screen w-screen flex justify-center items-center">
-      <Button onClick={handleLogin}>
-        Login with Monday
-      </Button>
+      <a href={loginUrl}>
+        <Button>Login with Monday</Button>
+      </a>
     </div>
   );
 }
-
-export default Login;

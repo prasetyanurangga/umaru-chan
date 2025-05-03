@@ -30,8 +30,8 @@ export async function GET(req: NextRequest, res: NextResponse) {
     
     const cookies = serialize('token', data.access_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // Pastikan hanya mengirimkan cookies melalui HTTPS di production
-      sameSite: 'lax', // Proteksi CSRF
+      secure: true, // Pastikan hanya mengirimkan cookies melalui HTTPS di production
+      sameSite: 'none', // Proteksi CSRF
       path: '/',
       maxAge: 60 * 60 * 24 * 7, // Token berlaku selama 7 hari
     });

@@ -6,7 +6,7 @@ import cookie from 'cookie';
 export async function GET(req: NextRequest, res: NextResponse) {
   const code = req.nextUrl.searchParams.get('code');
 
-  const url =  getBaseUrl(req);
+  const url =  getBaseUrl();
 
   try {
     const res = await fetch("https://auth.monday.com/oauth2/token", {

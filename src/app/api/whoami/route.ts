@@ -3,8 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(req: NextRequest) {
 
-      const url =  getBaseUrl(req);
-      console.log(req);
+      const url =  req.nextUrl.origin
   return NextResponse.json({
     MONDAY_CLIENT_ID: process.env.MONDAY_CLIENT_ID,
     MONDAY_CLIENT_SECRET: process.env.MONDAY_CLIENT_SECRET,

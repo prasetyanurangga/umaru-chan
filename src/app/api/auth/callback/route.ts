@@ -1,7 +1,7 @@
 import { getBaseUrl } from '@/app/lib/getBaseUrl';
 import { NextRequest, NextResponse } from 'next/server'
 
-import cookie from 'cookie';
+import { serialize } from 'cookie'; // Ini mengimpor fungsi 'serialize' secara spesifik
 
 export async function GET(req: NextRequest, res: NextResponse) {
   const code = req.nextUrl.searchParams.get('code');
@@ -28,7 +28,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
     const data = await res.json();
     
-    const cookies = cookie.serialize('token', data.access_token, {
+    const cookies = serialize('token', data.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // Pastikan hanya mengirimkan cookies melalui HTTPS di production
       sameSite: 'lax', // Proteksi CSRF
